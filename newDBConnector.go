@@ -5,7 +5,13 @@
 
 package go_db_utils
 
-import "go-db-utils/types"
+import (
+	"errors"
+	"go-db-utils/dbDriver"
+	"go-db-utils/types"
+	"reflect"
+	"strings"
+)
 
 //
 // NewDBConnector
@@ -14,14 +20,22 @@ import "go-db-utils/types"
 // @return dbLinker: 数据库连接
 // @return err:
 //
-func NewDBConnector(dbOption types.DataBaseOption) (dbLinker *types.DBLinker, err error) {
-	dbType := dbOption.DBType
-	dbHost := dbOption.DBHost
-	dbPort := dbOption.DBPort
-	dbName := dbOption.DBName
-	dbUsername := dbOption.DBUsername
-	dbPassword := dbOption.DBPassword
-	options := dbOption.Options
-
-	return nil, err
+func NewDBConnector(dbOption types.DataBaseOption) (dbLinker types.DBLinker, err error) {
+	dbType := strings.ToLower(dbOption.DBType)
+	refEntry := reflect.ValueOf(dbDriver.Entry{})
+	refMethod := refEntry.MethodByName(leftToUpper(dbType))
+	args := []reflect.Value{
+		reflect.ValueOf(dbOption),
+	}
+	valueSlice := refMethod.Call(args)
+	// 判断错误
+	errRes := valueSlice[1].Interface()
+	if errRes != nil {
+		return nil, errRes.(error)
+	}
+	dbLinker, ok := valueSlice[0].Interface().(types.DBLinker)
+	if !ok {
+		return nil, errors.New("断言类型错误")
+	}
+	return dbLinker, err
 }

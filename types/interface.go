@@ -12,26 +12,28 @@ import "database/sql"
 // @Description: 数据库连接抽象层
 //
 type DBLinker interface {
+	// GetConn 获取conn
+	GetConn() *sql.DB
 	//
 	// Query
 	// @Description: 原生查询,对结果不做任何转换
 	// @return map[string][]byte: value类型是[]byte([]uint8)
 	//
-	Query(sqlStr string) (map[string][]byte, error)
+	Query(sqlStr string) ([]map[string][]byte, error)
 
 	//
 	// QueryWithString
 	// @Description: 字符串查询, 返回结果全部转为string
 	// @return map[string]string: value类型是string
 	//
-	QueryWithString(sqlStr string) (map[string]string, error)
+	QueryWithString(sqlStr string) ([]map[string]string, error)
 
 	//
 	// QueryWithRealType
 	// @Description: 真实字段类型查询, 返回结果全部转为interface, 通过断言转为对应类型
 	// @return map[string]string: value类型是interface, 通过断言转为对应类型
 	//
-	QueryWithRealType(sqlStr string) (map[string]interface{}, error)
+	QueryWithRealType(sqlStr string) ([]map[string]interface{}, error)
 
 	//
 	// Exec
