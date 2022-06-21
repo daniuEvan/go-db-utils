@@ -33,7 +33,8 @@ func NewDBConnector(dbOption types.DataBaseOption) (dbLinker types.DBLinker, err
 	if errRes != nil {
 		return nil, errRes.(error)
 	}
-	dbLinker, ok := valueSlice[0].Interface().(types.DBLinker)
+	var ok bool
+	dbLinker, ok = valueSlice[0].Interface().(types.DBLinker)
 	if !ok {
 		return nil, errors.New("断言类型错误")
 	}
